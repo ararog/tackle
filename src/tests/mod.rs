@@ -1,13 +1,12 @@
-use std::error::Error;
-
-use crate::{Client, Hook};
+use crate::{Client, Hook, HookError};
 
 struct Smartty {
     name: String,
 }
 
 impl Hook<String, String> for Smartty {
-    type Result = Result<String, Box<dyn Error>>;
+    type Result = Result<String, HookError>;
+    type Error = HookError;
 
     async fn call(&self, input: String) -> Self::Result {
         Ok(format!("{} {}", self.name, input))
@@ -15,7 +14,7 @@ impl Hook<String, String> for Smartty {
 }
 
 #[tokio::test]
-async fn test_hook() -> Result<(), Box<dyn Error>> {
+async fn test_hook() -> Result<(), HookError> {
     let smart = Smartty {
         name: "Mark".to_string(),
     };
