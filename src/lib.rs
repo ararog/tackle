@@ -1,6 +1,14 @@
 #![doc = include_str!("../README.md")]
 #![deny(missing_docs)]
-use std::{error::Error, fmt::{Debug, Display}, future::Future, marker::PhantomData, pin::Pin, rc::Rc, result::Result};
+use std::{
+    error::Error,
+    fmt::{Debug, Display},
+    future::Future,
+    marker::PhantomData,
+    pin::Pin,
+    rc::Rc,
+    result::Result,
+};
 
 /// A future that resolves to a `Out` type.
 pub type HookFuture<'a, R> = Pin<Box<dyn Future<Output = R> + 'a>>;
@@ -11,19 +19,19 @@ pub type NextHook<H> = Rc<H>;
 #[derive(Debug)]
 /// Error type for hooks
 pub struct HookError {
-    description: String,
+    message: String,
 }
 
 impl HookError {
     /// Create a new hook error
-    pub fn new(description: String) -> Self {
-        Self { description }
+    pub fn new(message: String) -> Self {
+        Self { message }
     }
 }
 
 impl Display for HookError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.description)
+        write!(f, "{}", self.message)
     }
 }
 
@@ -41,7 +49,6 @@ impl Error for HookError {
     }
 }
 
-
 #[cfg(test)]
 mod tests;
 
@@ -58,7 +65,7 @@ mod tests;
 ///
 /// impl Hook<String, String> for MyHook {
 ///     type Result = Result<String, HookError>;
-///     
+///
 ///     async fn call(&self, input: String) -> Self::Result {
 ///         Ok(input)
 ///     }
@@ -189,7 +196,7 @@ where
     ///
     /// impl tackle::Hook<String, String> for MyHook {
     ///     type Result = String;
-    ///     
+    ///
     ///     async fn call(&self, input: String) -> Self::Result {
     ///         Ok(input)
     ///     }
@@ -197,9 +204,9 @@ where
     ///
     /// let client = Client::new(InnerClient).chain(MyHook);
     /// ```
-    /// 
+    ///
     /// # Notes
-    /// 
+    ///
     /// Keep in mind the last hook added to the chain will
     /// be the first to be called
     pub fn chain<C, Hout>(self, chain: C) -> Client<Hout, In, Out, E>
@@ -225,8 +232,8 @@ where
     ///
     /// ```
     /// use tackle::Client;
-    /// 
-    /// // The target struct which will do some processing at the 
+    ///
+    /// // The target struct which will do some processing at the
     /// // end of hook chain
     /// struct InnerClient;
     ///
@@ -238,7 +245,7 @@ where
     /// });
     /// ```
     /// # Notes
-    /// 
+    ///
     /// Keep in mind the last hook added to the chain will
     /// be the first to be called
     pub fn chain_fn<F, Fut>(self, f: F) -> Client<HookFn<F, H>, E, In, Out>
@@ -253,13 +260,13 @@ where
 
 impl<F, H, E, In, Out> Client<HookFn<F, H>, E, In, Out> {
     /// Initialize a client from hook
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `inner` - The hook to use
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// * `Self` - The new client
     pub fn from_fn(inner: HookFn<F, H>) -> Self {
         Self {
