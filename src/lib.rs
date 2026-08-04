@@ -65,6 +65,7 @@ mod tests;
 ///
 /// impl Hook<String, String> for MyHook {
 ///     type Result = Result<String, HookError>;
+///     type Error = HookError;
 ///
 ///     async fn call(&self, input: String) -> Self::Result {
 ///         Ok(input)
@@ -149,7 +150,6 @@ where
     E: Error,
 {
     type Result = Result<Out, E>;
-
     type Error = E;
 
     async fn call(&self, input: In) -> Self::Result {
@@ -161,7 +161,7 @@ where
 /// Client struct
 pub struct Client<H, In, Out, E = HookError> {
     hook: H,
-    _marker: PhantomData<(E, In, Out)>,
+    _marker: PhantomData<(In, Out, E)>,
 }
 
 impl<H, E, In, Out> Client<H, In, Out, E>
@@ -195,7 +195,8 @@ where
     /// struct MyHook;
     ///
     /// impl tackle::Hook<String, String> for MyHook {
-    ///     type Result = String;
+    ///     type Result = Result<String, HookError>;
+    ///     type Error = HookError;
     ///
     ///     async fn call(&self, input: String) -> Self::Result {
     ///         Ok(input)
@@ -248,7 +249,7 @@ where
     ///
     /// Keep in mind the last hook added to the chain will
     /// be the first to be called
-    pub fn chain_fn<F, Fut>(self, f: F) -> Client<HookFn<F, H>, E, In, Out>
+    pub fn chain_fn<F, Fut>(self, f: F) -> Client<HookFn<F, H>, In, Out, E>
     where
         F: Fn(In, NextHook<H>) -> Fut + Send,
         E: Error,
