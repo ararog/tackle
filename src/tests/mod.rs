@@ -19,15 +19,20 @@ async fn test_hook() -> Result<(), HookError> {
         name: "Mark".to_string(),
     };
 
-    let client = Client::<Smartty, String, String>::new(smart)
-      .chain_fn(|req, next| async move {
-          let output  = next.call(req).await?;
-          Ok(format!("{} {}", output, "Holmes"))
-      });
+    let client = Client::<Smartty, String, String>::new(smart).chain_fn(|req, next| async move {
+        let output = next.call(req).await?;
+        Ok(format!("{} {}", output, "Holmes"))
+    });
 
     let output = client.hook.call("Hello".to_string()).await?;
 
     assert_eq!(output, "Mark Hello Holmes");
 
     Ok(())
+}
+
+#[test]
+fn test_error() {
+    let error = HookError::new("test".to_string());
+    assert_eq!(error.to_string(), "test");
 }
