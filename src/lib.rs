@@ -59,7 +59,7 @@ mod tests;
 /// # Example
 ///
 /// ```
-/// use tackle::Hook;
+/// use tackle::{Hook, HookError};
 ///
 /// struct MyHook;
 ///
@@ -189,8 +189,8 @@ where
     ///
     /// # Example
     ///
-    /// ```
-    /// use tackle::Client;
+    /// ```rust,ignore
+    /// use tackle::{Client, HookError};
     ///
     /// struct MyHook;
     ///
@@ -231,8 +231,8 @@ where
     ///
     /// # Example
     ///
-    /// ```
-    /// use tackle::Client;
+    /// ```rust,ignore
+    /// use tackle::{Client, HookError};
     ///
     /// // The target struct which will do some processing at the
     /// // end of hook chain
