@@ -13,8 +13,34 @@ use std::{
 /// A future that resolves to a `Out` type.
 pub type HookFuture<'a, R> = Pin<Box<dyn Future<Output = R> + 'a>>;
 
-/// Type alias for a hook that can be chained
-pub type NextHook<H> = Rc<H>;
+/// NewType for Rc
+pub struct NextHook<H>(Rc<H>);
+
+impl<H, In, Out> Hook<In, Out> for NextHook<H>
+where
+    H: Hook<In, Out>,
+{
+    type Result = H::Result;
+    type Error = H::Error;
+
+    async fn call(&self, input: In) -> Self::Result {
+        self.0
+            .call(input)
+            .await
+    }
+}
+
+impl<H> From<H> for NextHook<H> {
+    fn from(value: H) -> Self {
+        NextHook(Rc::new(value))
+    }
+}
+
+impl<H> Clone for NextHook<H> {
+    fn clone(&self) -> Self {
+        Self(self.0.clone())
+    }
+}
 
 #[derive(Debug)]
 /// Error type for hooks
@@ -109,7 +135,7 @@ pub trait Chain<H, E, In, Out> {
 ///
 /// * `H` - The type of the hook to pull
 pub struct HookFn<F, H> {
-    inner: Rc<H>,
+    inner: NextHook<H>,
     closure: F,
 }
 
