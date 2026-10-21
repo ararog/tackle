@@ -100,7 +100,9 @@ where
     type Error = H::Error;
 
     async fn call(&self, input: In) -> Self::Result {
-        self.as_ref().call(input).await
+        self.as_ref()
+            .call(input)
+            .await
     }
 }
 
@@ -135,10 +137,7 @@ impl<F, H> HookFn<F, H> {
     ///
     /// * `Self` - The new hook
     pub fn new(inner: H, closure: F) -> Self {
-        Self {
-            inner: inner.into(),
-            closure,
-        }
+        Self { inner: inner.into(), closure }
     }
 }
 
@@ -171,10 +170,7 @@ where
 {
     /// Initialize a client from hook
     pub fn new(inner: H) -> Self {
-        Self {
-            hook: inner,
-            _marker: PhantomData,
-        }
+        Self { hook: inner, _marker: PhantomData }
     }
 
     /// Add a new hook to the chain
@@ -270,9 +266,6 @@ impl<F, H, E, In, Out> Client<HookFn<F, H>, E, In, Out> {
     ///
     /// * `Self` - The new client
     pub fn from_fn(inner: HookFn<F, H>) -> Self {
-        Self {
-            hook: inner,
-            _marker: PhantomData,
-        }
+        Self { hook: inner, _marker: PhantomData }
     }
 }
