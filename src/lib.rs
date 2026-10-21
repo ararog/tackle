@@ -35,19 +35,7 @@ impl Display for HookError {
     }
 }
 
-impl Error for HookError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        None
-    }
-
-    fn description(&self) -> &str {
-        "description() is deprecated; use Display"
-    }
-
-    fn cause(&self) -> Option<&dyn Error> {
-        self.source()
-    }
-}
+impl Error for HookError {}
 
 #[cfg(test)]
 mod tests;
