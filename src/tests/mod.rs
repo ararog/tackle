@@ -34,7 +34,9 @@ where
     type Error = HookError;
 
     async fn call(&self, input: String) -> Self::Result {
-        self.inner.call(input).await
+        self.inner
+            .call(input)
+            .await
     }
 }
 
@@ -53,16 +55,19 @@ where
 
 #[tokio::test]
 async fn test_inline_hook() -> Result<(), HookError> {
-    let smart = Smartty {
-        name: "Mark".to_string(),
-    };
+    let smart = Smartty { name: "Mark".to_string() };
 
     let client = Client::<Smartty, String, String>::new(smart).chain_fn(|req, next| async move {
-        let output = next.call(req).await?;
+        let output = next
+            .call(req)
+            .await?;
         Ok(format!("{} {}", output, "Holmes"))
     });
 
-    let output = client.hook.call("Hello".to_string()).await?;
+    let output = client
+        .hook
+        .call("Hello".to_string())
+        .await?;
 
     assert_eq!(output, "Mark Hello Holmes");
 
@@ -71,21 +76,26 @@ async fn test_inline_hook() -> Result<(), HookError> {
 
 #[tokio::test]
 async fn test_chained_hook() -> Result<(), HookError> {
-    let smart = Smartty {
-        name: "Mark".to_string(),
-    };
+    let smart = Smartty { name: "Mark".to_string() };
 
     let client = Client::<Smartty, String, String>::new(smart)
         .chain_fn(|req, next| async move {
-            let output = next.call(req).await?;
+            let output = next
+                .call(req)
+                .await?;
             Ok(format!("{} {}", output, "Holmes"))
         })
         .chain_fn(|req, next| async move {
-            let output = next.call(req).await?;
+            let output = next
+                .call(req)
+                .await?;
             Ok(format!("{} {}", output, "Junior"))
         });
 
-    let output = client.hook.call("Hello".to_string()).await?;
+    let output = client
+        .hook
+        .call("Hello".to_string())
+        .await?;
 
     assert_eq!(output, "Mark Hello Holmes Junior");
 
@@ -94,18 +104,21 @@ async fn test_chained_hook() -> Result<(), HookError> {
 
 #[tokio::test]
 async fn test_hook_impl() -> Result<(), HookError> {
-    let smart = Smartty {
-        name: "Mark".to_string(),
-    };
+    let smart = Smartty { name: "Mark".to_string() };
 
     let client = Client::<Smartty, String, String>::new(smart)
         .chain_fn(|req, next| async move {
-            let output = next.call(req).await?;
+            let output = next
+                .call(req)
+                .await?;
             Ok(format!("{} {}", output, "Holmes"))
         })
         .chain(OhMy);
 
-    let output = client.hook.call("Hello".to_string()).await?;
+    let output = client
+        .hook
+        .call("Hello".to_string())
+        .await?;
 
     assert_eq!(output, "Mark Hello Holmes");
 
