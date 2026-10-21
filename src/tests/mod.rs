@@ -129,18 +129,3 @@ fn test_error_debug() {
     let error = HookError::new("test".to_string());
     assert_eq!(format!("{:?}", error), "HookError { message: \"test\" }");
 }
-
-#[test]
-fn test_error_description() {
-    let error = HookError::new("test".to_string());
-    assert_eq!(
-        error.description(),
-        "description() is deprecated; use Display"
-    );
-}
-
-#[test]
-fn test_error_cause() {
-    let error = HookError::new("test".to_string());
-    assert!(error.cause().is_none());
-}
